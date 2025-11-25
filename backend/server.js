@@ -53,3 +53,14 @@ app.get('/products', async (req, res) => {
     res.status(500).json({ error: 'Failed to read products' });
   }
 });
+
+app.get('/products/:id', async (req, res) => {
+  try {
+    const products = await readData();
+    const prod = products.find(p => String(p.id) === String(req.params.id));
+    if (!prod) return res.status(404).json({ error: 'Not found' });
+    res.json(prod);
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
