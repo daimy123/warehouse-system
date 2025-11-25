@@ -39,3 +39,33 @@
         <h1>Warehouse Inventory</h1>
       </div>
     </header>
+
+     <div class="grid">
+      <section class="card">
+        <h3 style="margin-top:0">Add / Update Product</h3>
+        <div class="form-row" style="margin-bottom:10px">
+          <input id="name" placeholder="Name" />
+          <input id="category" placeholder="Category" />
+          <input id="quantity" type="number" placeholder="Quantity" />
+          <input id="location" placeholder="Location" />
+          <input id="supplier" placeholder="Supplier" />
+        </div>
+        <div style="display:flex;gap:10px">
+          <button id="addBtn">Add Product</button>
+          <button id="updateBtn" class="secondary">Update Selected</button>
+          <button id="clearBtn" class="secondary">Clear</button>
+        </div>
+
+        <hr style="border:none;height:1px;background:rgba(255,255,255,0.02);margin:14px 0">
+
+        <div style="display:flex;gap:8px;align-items:center">
+          <input id="search" placeholder="Search by name or category" style="flex:1" />
+          <button id="searchBtn" class="secondary">Search</button>
+          <button id="refreshBtn" class="secondary">Refresh</button>
+          <select id="sort" style="min-width:160px">
+            <option value="">Sort (none)</option>
+            <option value="quantity_desc">Qty high → low</option>
+            <option value="quantity_asc">Qty low → high</option>
+          </select>
+        </div>
+      </section>
