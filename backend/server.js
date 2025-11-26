@@ -89,3 +89,17 @@ app.post('/products', async (req, res) => {
     res.status(500).json({ error: 'Failed to create product' });
   }
 });
+
+app.delete('/products/:id', async (req, res) => {
+  try {
+    let products = await readData();
+    const before = products.length;
+    products = products.filter(p => String(p.id) !== String(req.params.id));
+    if (products.length === before) return res.status(404).json({ error: 'Not found' });
+    await writeData(products);
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to delete' });
+  }
+});
