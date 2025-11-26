@@ -64,3 +64,28 @@ app.get('/products/:id', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
+app.post('/products', async (req, res) => {
+  try {
+    const { name, category, quantity = 0, location = '', supplier = '' } = req.body;
+    if (!name) return res.status(400).json({ error: 'Name is required' });
+    if (Number(quantity) < 0) return res.status(400).json({ error: 'Quantity cannot be negative' });
+
+    const products = await readData();
+    const newProduct = {
+      id: Date.now().toString(),
+      name,
+      category,
+      quantity: Number(quantity),
+      location,
+      supplier,
+      updatedDate: new Date().toISOString()
+    };
+    products.push(newProduct);
+    await writeData(products);
+    res.status(201).json(newProduct);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to create product' });
+  }
+});
