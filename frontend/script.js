@@ -27,3 +27,12 @@ function rowHtml(p){
     </td>
   </tr>`;
 }
+
+function escapeHtml(s){ return (s===undefined||s===null)? '' : String(s).replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+
+async function load(q='', sort=''){
+  const products = await fetchProducts(q, sort);
+  const tbody = document.querySelector('#productsTable tbody');
+  tbody.innerHTML = products.map(rowHtml).join('') || '<tr><td colspan="6" style="color:var(--muted)">No products</td></tr>';
+  document.getElementById('total').textContent = products.length;
+}
