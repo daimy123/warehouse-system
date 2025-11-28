@@ -36,3 +36,17 @@ async function load(q='', sort=''){
   tbody.innerHTML = products.map(rowHtml).join('') || '<tr><td colspan="6" style="color:var(--muted)">No products</td></tr>';
   document.getElementById('total').textContent = products.length;
 }
+
+async function addProduct(){
+  const body = {
+    name: document.getElementById('name').value.trim(),
+    category: document.getElementById('category').value.trim(),
+    quantity: Number(document.getElementById('quantity').value || 0),
+    location: document.getElementById('location').value.trim(),
+    supplier: document.getElementById('supplier').value.trim()
+  };
+  if(!body.name){ alert('Name required'); return; }
+  const r = await fetch(API, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+  if(!r.ok){ const err = await r.json(); alert(err.error || 'Add failed'); return; }
+  clearForm(); load();
+}
