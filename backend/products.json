@@ -1,11 +1,11 @@
 [
   {
-    "id": "1764803883062",
+    "id": "1764805498043",
     "name": "Test",
     "category": "Home",
-    "quantity": 3,
+    "quantity": 11,
     "location": "Rack A1",
     "supplier": "Amazon",
-    "updatedDate": "2025-12-03T23:18:03.062Z"
+    "updatedDate": "2025-12-03T23:44:58.043Z"
   }
 ]
