@@ -1,5 +1,5 @@
-// frontend/script.js — simplified for same-origin API (Option B)
-const API = '/products'; // relative path — backend and frontend share origin
+// frontend/script.js - uses same-origin API at /products
+const API = '/products';
 let selectedId = null;
 const lowThreshold = 10;
 
@@ -21,13 +21,31 @@ function rowHtml(p){
   </tr>`;
 }
 
+// safe JSON parse: returns object or { __rawText: '...' }
+async function safeJsonResponse(res){
+  const text = await res.text().catch(()=>null);
+  try { return text ? JSON.parse(text) : {}; } catch(e){ return { __rawText: text || '' }; }
+}
+
+// small fetch retry wrapper for transient failures
+async function fetchWithRetry(url, opts={}, retries=1, delay=400){
+  try {
+    return await fetch(url, opts);
+  } catch (err) {
+    if (retries <= 0) throw err;
+    await new Promise(r=>setTimeout(r, delay));
+    return fetchWithRetry(url, opts, retries-1, delay);
+  }
+}
+
 async function fetchProducts(q='', sort='') {
   let url = API;
   const params = new URLSearchParams();
   if (q) params.set('q', q);
   if (sort) params.set('sort', sort);
   const full = url + (params.toString() ? '?'+params.toString() : '');
-  const res = await fetch(full);
+  const res = await fetchWithRetry(full, {}, 1);
+  if (!res.ok) throw new Error(`Failed to fetch products: ${res.status} ${res.statusText}`);
   return res.json();
 }
 
@@ -56,8 +74,13 @@ async function addProduct(){
     supplier: document.getElementById('supplier').value.trim()
   };
   if(!body.name){ alert('Name required'); return; }
-  const r = await fetch(API, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
-  if(!r.ok){ const err = await r.json().catch(()=>({error:'unknown'})); alert(err.error || 'Add failed'); return; }
+  const res = await fetchWithRetry(API, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)}, 1);
+  if(!res.ok){
+    const parsed = await safeJsonResponse(res);
+    const message = parsed && parsed.error ? parsed.error : (parsed.__rawText || `${res.status} ${res.statusText}`);
+    alert('Add failed: ' + message);
+    return;
+  }
   clearForm(); load();
 }
 
@@ -70,8 +93,13 @@ async function updateProduct(){
     location: document.getElementById('location').value.trim(),
     supplier: document.getElementById('supplier').value.trim()
   };
-  const r = await fetch(`${API}/${selectedId}`, {method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
-  if(!r.ok){ const err = await r.json().catch(()=>({error:'unknown'})); alert(err.error || 'Update failed'); return; }
+  const res = await fetchWithRetry(`${API}/${selectedId}`, {method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)}, 1);
+  if(!res.ok){
+    const parsed = await safeJsonResponse(res);
+    const message = parsed && parsed.error ? parsed.error : (parsed.__rawText || `${res.status} ${res.statusText}`);
+    alert('Update failed: ' + message);
+    return;
+  }
   clearForm(); selectedId=null; load();
 }
 
@@ -103,12 +131,15 @@ document.addEventListener('click', async (e)=>{
   if(e.target.matches('.del')){
     const tr = e.target.closest('tr'); const id = tr.dataset.id;
     if(!confirm('Delete?')) return;
-    await fetch(`${API}/${id}`, {method:'DELETE'}); load();
+    await fetchWithRetry(`${API}/${id}`, {method:'DELETE'}, 1);
+    load();
   }
 
   if(e.target.matches('.edit')){
     const tr = e.target.closest('tr'); const id = tr.dataset.id;
-    const res = await fetch(`${API}/${id}`); const p = await res.json();
+    const res = await fetchWithRetry(`${API}/${id}`, {}, 1);
+    if(!res.ok){ alert('Failed to fetch product'); return; }
+    const p = await res.json();
     document.getElementById('name').value = p.name || '';
     document.getElementById('category').value = p.category || '';
     document.getElementById('quantity').value = p.quantity || 0;
@@ -119,7 +150,6 @@ document.addEventListener('click', async (e)=>{
 
   if(e.target.matches('.select')){
     const tr = e.target.closest('tr'); const id = tr.dataset.id;
-    // highlight selected row (simple)
     document.querySelectorAll('#productsTable tr').forEach(r=>r.style.background='transparent');
     tr.style.background='rgba(6,182,212,0.06)';
     selectedId = id;
