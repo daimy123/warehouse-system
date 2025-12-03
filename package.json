@@ -1,23 +1,19 @@
 {
   "name": "warehouse-system",
   "version": "1.0.0",
-  "description": "Warehouse Inventory System (CRUD API + Frontend)",
+  "description": "Simple warehouse inventory demo (backend + frontend served from same Express server)",
   "main": "backend/server.js",
   "scripts": {
     "start": "node backend/server.js",
-    "dev": "nodemon backend/server.js",
-    "test": "jest"
+    "dev": "nodemon backend/server.js"
   },
-  "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.18.2"
   },
   "devDependencies": {
-    "jest": "^29.7.0",
-    "nodemon": "^3.0.1",
-    "supertest": "^6.3.4"
+    "nodemon": "^3.1.11"
   }
 }
