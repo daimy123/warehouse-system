@@ -89,3 +89,34 @@ document.addEventListener('click', async (e)=>{
     a.href = url; a.download = 'products.json'; a.click(); URL.revokeObjectURL(url);
     return;
   }
+
+  if(e.target.matches('.del')){
+    const tr = e.target.closest('tr'); const id = tr.dataset.id;
+    if(!confirm('Delete?')) return;
+    await fetch(`${API}/${id}`, {method:'DELETE'}); load();
+  }
+
+  if(e.target.matches('.edit')){
+    const tr = e.target.closest('tr'); const id = tr.dataset.id;
+    const res = await fetch(`${API}/${id}`); const p = await res.json();
+    document.getElementById('name').value = p.name || '';
+    document.getElementById('category').value = p.category || '';
+    document.getElementById('quantity').value = p.quantity || 0;
+    document.getElementById('location').value = p.location || '';
+    document.getElementById('supplier').value = p.supplier || '';
+    selectedId = id;
+  }
+
+  if(e.target.matches('.select')){
+    const tr = e.target.closest('tr'); const id = tr.dataset.id;
+    // highlight selected row (simple)
+    document.querySelectorAll('#productsTable tr').forEach(r=>r.style.background='transparent');
+    tr.style.background='rgba(6,182,212,0.06)';
+    selectedId = id;
+  }
+});
+
+window.addEventListener('load', ()=> load());
+
+
+  
