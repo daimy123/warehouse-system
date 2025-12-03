@@ -1,29 +1,11 @@
 [
   {
-    "id": "1764804770887",
+    "id": "1764803883062",
     "name": "Test",
     "category": "Home",
-    "quantity": 11,
+    "quantity": 3,
     "location": "Rack A1",
     "supplier": "Amazon",
-    "updatedDate": "2025-12-03T23:32:50.887Z"
-  },
-  {
-    "id": "1764804787456",
-    "name": "Test",
-    "category": "Home",
-    "quantity": 11,
-    "location": "Rack A1",
-    "supplier": "Amazon",
-    "updatedDate": "2025-12-03T23:33:07.456Z"
-  },
-  {
-    "id": "1764804869034",
-    "name": "Test",
-    "category": "Home",
-    "quantity": 111,
-    "location": "Rack A1",
-    "supplier": "Amazon",
-    "updatedDate": "2025-12-03T23:34:29.034Z"
+    "updatedDate": "2025-12-03T23:18:03.062Z"
   }
 ]
