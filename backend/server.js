@@ -5,8 +5,19 @@ const fs = require('fs').promises;
 const path = require('path');
 
 const app = express();
+
+// enable CORS for all origins (dev). Also handle preflight OPTIONS.
 app.use(cors());
+app.options('*', cors());
+
+// tiny request logger (helpful while debugging Codespaces + forwarded URLs)
+app.use((req, res, next) => {
+  console.log(`[req] ${req.method} ${req.originalUrl} - origin: ${req.get('origin')}`);
+  next();
+});
+
 app.use(express.json());
+
 
 const DATA_PATH = path.join(__dirname, 'products.json');
 
