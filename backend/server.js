@@ -1,23 +1,16 @@
 // backend/server.js
 const express = require('express');
-const cors = require('cors');
+const cors = require('cors'); // optional; keep for dev if needed
 const fs = require('fs').promises;
 const path = require('path');
 
 const app = express();
 
-// enable CORS for all origins (dev). Also handle preflight OPTIONS.
+// keep CORS for dev convenience (safe if you later restrict to your domain)
 app.use(cors());
 app.options('*', cors());
 
-// tiny request logger (helpful while debugging Codespaces + forwarded URLs)
-app.use((req, res, next) => {
-  console.log(`[req] ${req.method} ${req.originalUrl} - origin: ${req.get('origin')}`);
-  next();
-});
-
 app.use(express.json());
-
 
 const DATA_PATH = path.join(__dirname, 'products.json');
 
@@ -38,10 +31,7 @@ async function writeData(data) {
   await fs.writeFile(DATA_PATH, JSON.stringify(data, null, 2), 'utf8');
 }
 
-/**
- * GET /products
- * Optional query: ?q=searchTerm (name or category), ?sort=quantity_asc|quantity_desc
- */
+/* API routes (unchanged) */
 app.get('/products', async (req, res) => {
   try {
     let products = await readData();
@@ -101,6 +91,23 @@ app.post('/products', async (req, res) => {
   }
 });
 
+app.put('/products/:id', async (req, res) => {
+  try {
+    const products = await readData();
+    const idx = products.findIndex(p => String(p.id) === String(req.params.id));
+    if (idx === -1) return res.status(404).json({ error: 'Not found' });
+
+    // merge update fields (basic)
+    const updated = { ...products[idx], ...req.body, updatedDate: new Date().toISOString() };
+    products[idx] = updated;
+    await writeData(products);
+    res.json(updated);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to update' });
+  }
+});
+
 app.delete('/products/:id', async (req, res) => {
   try {
     let products = await readData();
@@ -115,5 +122,15 @@ app.delete('/products/:id', async (req, res) => {
   }
 });
 
+/* ---- Serve frontend static files ---- */
+const FRONTEND_PATH = path.join(__dirname, '..', 'frontend');
+app.use(express.static(FRONTEND_PATH));
+
+// SPA fallback — always serve index.html for client-side routing
+app.get('*', (req, res) => {
+  res.sendFile(path.join(FRONTEND_PATH, 'index.html'));
+});
+
+/* Start server using PORT from env (Render sets PORT) */
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, ()=> console.log(`Server running on http://localhost:${PORT}`));

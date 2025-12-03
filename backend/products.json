@@ -1,1 +1,56 @@
-[]
+[
+  {
+    "id": "1764803625474",
+    "name": "Test",
+    "category": "Home",
+    "quantity": 10,
+    "location": "Rack A1",
+    "supplier": "Amazon",
+    "updatedDate": "2025-12-03T23:13:45.474Z"
+  },
+  {
+    "id": "1764803626682",
+    "name": "Test",
+    "category": "Home",
+    "quantity": 10,
+    "location": "Rack A1",
+    "supplier": "Amazon",
+    "updatedDate": "2025-12-03T23:13:46.682Z"
+  },
+  {
+    "id": "1764803626955",
+    "name": "Test",
+    "category": "Home",
+    "quantity": 10,
+    "location": "Rack A1",
+    "supplier": "Amazon",
+    "updatedDate": "2025-12-03T23:13:46.955Z"
+  },
+  {
+    "id": "1764803871285",
+    "name": "Vijay",
+    "category": "Home",
+    "quantity": 0,
+    "location": "",
+    "supplier": "",
+    "updatedDate": "2025-12-03T23:17:51.285Z"
+  },
+  {
+    "id": "1764803882002",
+    "name": "Test",
+    "category": "Home",
+    "quantity": 3,
+    "location": "Rack A1",
+    "supplier": "Amazon",
+    "updatedDate": "2025-12-03T23:18:02.002Z"
+  },
+  {
+    "id": "1764803883062",
+    "name": "Test",
+    "category": "Home",
+    "quantity": 3,
+    "location": "Rack A1",
+    "supplier": "Amazon",
+    "updatedDate": "2025-12-03T23:18:03.062Z"
+  }
+]
