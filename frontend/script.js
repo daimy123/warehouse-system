@@ -64,3 +64,28 @@ async function updateProduct(){
   if(!r.ok){ const err = await r.json(); alert(err.error || 'Update failed'); return; }
   clearForm(); selectedId=null; load();
 }
+
+function clearForm(){
+  ['name','category','quantity','location','supplier'].forEach(id=>document.getElementById(id).value='');
+  selectedId = null;
+}
+
+document.addEventListener('click', async (e)=>{
+  if(e.target.matches('#addBtn')) return addProduct();
+  if(e.target.matches('#updateBtn')) return updateProduct();
+  if(e.target.matches('#clearBtn')) return clearForm();
+  if(e.target.matches('#refreshBtn')) return load();
+  if(e.target.matches('#searchBtn')) {
+    const q = document.getElementById('search').value.trim();
+    const sort = document.getElementById('sort').value;
+    return load(q, sort);
+  }
+  if(e.target.matches('#sort')) return load(document.getElementById('search').value.trim(), e.target.value);
+  if(e.target.matches('#exportBtn')){
+    const products = await fetchProducts();
+    const blob = new Blob([JSON.stringify(products, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'products.json'; a.click(); URL.revokeObjectURL(url);
+    return;
+  }
