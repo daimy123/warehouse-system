@@ -50,3 +50,17 @@ async function addProduct(){
   if(!r.ok){ const err = await r.json(); alert(err.error || 'Add failed'); return; }
   clearForm(); load();
 }
+
+async function updateProduct(){
+  if(!selectedId){ alert('Select a product first (Select button)'); return; }
+  const body = {
+    name: document.getElementById('name').value.trim(),
+    category: document.getElementById('category').value.trim(),
+    quantity: Number(document.getElementById('quantity').value || 0),
+    location: document.getElementById('location').value.trim(),
+    supplier: document.getElementById('supplier').value.trim()
+  };
+  const r = await fetch(`${API}/${selectedId}`, {method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)});
+  if(!r.ok){ const err = await r.json(); alert(err.error || 'Update failed'); return; }
+  clearForm(); selectedId=null; load();
+}
