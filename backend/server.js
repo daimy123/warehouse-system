@@ -1,16 +1,18 @@
 // backend/server.js
 const express = require('express');
-const cors = require('cors'); // optional; keep for dev if needed
+const cors = require('cors'); // left for dev, harmless in same-origin deploy
 const fs = require('fs').promises;
 const path = require('path');
 
 const app = express();
-
-// keep CORS for dev convenience (safe if you later restrict to your domain)
 app.use(cors());
-app.options('*', cors());
-
 app.use(express.json());
+
+// quick request logger
+app.use((req, res, next) => {
+  console.log(`[req] ${new Date().toISOString()} ${req.method} ${req.originalUrl} origin=${req.headers.origin || '-'} body=${JSON.stringify(req.body||{})}`);
+  next();
+});
 
 const DATA_PATH = path.join(__dirname, 'products.json');
 
@@ -31,7 +33,12 @@ async function writeData(data) {
   await fs.writeFile(DATA_PATH, JSON.stringify(data, null, 2), 'utf8');
 }
 
-/* API routes (unchanged) */
+/* API */
+
+/**
+ * GET /products
+ * Optional q=search, sort=quantity_asc|quantity_desc
+ */
 app.get('/products', async (req, res) => {
   try {
     let products = await readData();
@@ -62,6 +69,7 @@ app.get('/products/:id', async (req, res) => {
     if (!prod) return res.status(404).json({ error: 'Not found' });
     res.json(prod);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -97,7 +105,6 @@ app.put('/products/:id', async (req, res) => {
     const idx = products.findIndex(p => String(p.id) === String(req.params.id));
     if (idx === -1) return res.status(404).json({ error: 'Not found' });
 
-    // merge update fields (basic)
     const updated = { ...products[idx], ...req.body, updatedDate: new Date().toISOString() };
     products[idx] = updated;
     await writeData(products);
@@ -122,15 +129,15 @@ app.delete('/products/:id', async (req, res) => {
   }
 });
 
-/* ---- Serve frontend static files ---- */
+/* Serve frontend static files */
 const FRONTEND_PATH = path.join(__dirname, '..', 'frontend');
 app.use(express.static(FRONTEND_PATH));
 
-// SPA fallback — always serve index.html for client-side routing
+// SPA fallback
 app.get('*', (req, res) => {
   res.sendFile(path.join(FRONTEND_PATH, 'index.html'));
 });
 
-/* Start server using PORT from env (Render sets PORT) */
+/* Start server */
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, ()=> console.log(`Server running on http://localhost:${PORT}`));
