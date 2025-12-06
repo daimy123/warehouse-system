@@ -1,5 +1,5 @@
 // frontend/script.js - uses same-origin API at /products
-const API = '/products';
+const API = 'https://warehouse-system-production-8874.up.railway.app/products';
 let selectedId = null;
 const lowThreshold = 10;
 
